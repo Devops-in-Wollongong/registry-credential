@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: image-registry-creds-ds
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: image-reg
+  template:
+    metadata:
+      labels:
+        k8s-app: image-reg
+    spec:
+      containers:
+        - name: reg-cred
+          image: busybox
+          command: [ 'sh' ]
+          args: [ '-c', 'cp /conf/.dockerconfigjson /var/lib/kubelet/config.json && exec tail -f /dev/null' ]
+          volumeMounts:
+            - name: kubelet-config
+              mountPath: /var/lib/kubelet
+            - name: reg-cred
+              mountPath: /conf/
+      priorityClassName: system-node-critical
+      volumes:
+        - name: kubelet-config
+          hostPath:
+            path: /var/lib/kubelet
+        - name: reg-cred
+          secret:
+            secretName: registry-cred

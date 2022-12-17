@@ -1,0 +1,6 @@
+auths:
+  docker.io/library:
+    username: ""
+    password: ""
+    email: ""
+    auth: ""
